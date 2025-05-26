@@ -6,6 +6,7 @@ from asyncua import Client
 import time
 
 hwtypes = ['Mainboard','SuperIO','CPU','RAM','GpuNvidia','GpuAti','TBalancer','Heatmaster','HDD']
+update_interval = 15
 
 class TemperatureOPCUAClient:
     def __init__(self, config_path='config.json'):
@@ -30,8 +31,7 @@ class TemperatureOPCUAClient:
                     "building_number": 1,
                     "room_number": 101,
                     "pc_number": 1
-                },
-                "update_interval": 5
+                }
             }
             with open(config_path, 'w', encoding='utf-8') as f:
                 json.dump(default_config, f, indent=4, ensure_ascii=False)
@@ -242,7 +242,7 @@ async def main():
                 print("Датчики температуры не найдены")
             
             # Ожидание перед следующим циклом
-            await asyncio.sleep(opcua_client.config['update_interval'])
+            await asyncio.sleep(update_interval)
             
     except KeyboardInterrupt:
         print("\nОстановка программы...")
