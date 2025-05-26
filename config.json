@@ -1,0 +1,12 @@
+{
+  "opcua_server": {
+    "url": "opc.tcp://localhost:4840/freeopcua/server/",
+    "namespace": "http://university.temperature.monitoring"
+  },
+  "location": {
+    "building_number": 1,
+    "room_number": 101,
+    "pc_number": 1
+  },
+  "update_interval": 5
+}
