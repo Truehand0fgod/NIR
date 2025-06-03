@@ -1,5 +1,7 @@
 import clr
 import os
+import sys
+import ctypes
 import json
 import asyncio
 from asyncua import Client, ua
@@ -22,6 +24,37 @@ HARDWARE_TYPES = {
 }
 
 UPDATE_INTERVAL = 10  # Интервал обновления в секундах
+
+def is_admin():
+    try:
+        return ctypes.windll.shell32.IsUserAnAdmin()
+    except:
+        return False
+
+def run_as_admin():
+    """Перезапуск программы с правами администратора"""
+    try:
+        if is_admin():
+            return True
+        else:
+            print("Запрос прав администратора...")
+            # Получаем путь к текущему скрипту
+            script_path = os.path.abspath(sys.argv[0])
+            
+            # Запускаем скрипт с правами администратора
+            ctypes.windll.shell32.ShellExecuteW(
+                None, 
+                "runas", 
+                sys.executable, 
+                f'"{script_path}"', 
+                None, 
+                1
+            )
+            return False
+    except Exception as e:
+        print(f"Ошибка при запросе прав администратора: {e}")
+        return False
+
 
 class TemperatureOPCUAClient:
     def __init__(self, config_path='config.json'):
@@ -80,9 +113,6 @@ class TemperatureOPCUAClient:
                     pass
                     
             self.client = Client(self.config['opcua_server']['url'])
-            
-            # Настройка безопасности и таймаутов
-            self.client.set_security_string("None")
             
             # Установка таймаутов
             timeout = self.config['opcua_server'].get('connection_timeout', 10)
@@ -190,18 +220,20 @@ def unblock_file(file_path):
 def initialize_openhardwaremonitor():
     """Инициализация библиотеки OpenHardwareMonitor"""
     try:
-        file = rf'{os.getcwd()}\ohm\OpenHardwareMonitorLib.dll'
+        file_path = rf'{os.getcwd()}\ohm\OpenHardwareMonitorLib.dll'
         
         # Проверяем существование файла
-        if not os.path.exists(file):
-            print(f"ERROR: Файл не найден: {file}")
+        if not os.path.exists(file_path):
+            print(f"ERROR: Файл не найден: {file_path}")
             print("INFO: Убедитесь что папка 'ohm' с библиотекой OpenHardwareMonitorLib.dll находится в текущей директории")
             return None
             
-        unblock_file(file)
-        clr.AddReference(file)
-
+        unblock_file(file_path)
+        clr.AddReference(file_path)
+        print("Библиотека успешно загружена")
+        
         from OpenHardwareMonitor import Hardware
+        print("Модуль Hardware импортирован")
 
         handle = Hardware.Computer()
         handle.MainboardEnabled = True
@@ -215,7 +247,8 @@ def initialize_openhardwaremonitor():
         return handle
         
     except Exception as e:
-        print(f"ERROR: Ошибка инициализации OpenHardwareMonitor: {e}")
+        print(f"Ошибка инициализации: {e}")
+        print(f"Тип ошибки: {type(e)}")
         return None
 
 def fetch_stats(handle):
@@ -271,6 +304,10 @@ def fetch_stats(handle):
     return sensor_data
 
 async def main():
+    if not run_as_admin():
+        print("Перезапуск с правами администратора...")
+        sys.exit(0)
+
     print("STARTING: Запуск универсального клиента мониторинга температуры")
     print("=" * 60)
     

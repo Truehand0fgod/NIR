@@ -48,11 +48,11 @@ class TemperatureOPCUAServer:
         
         # Создаем узлы для нескольких типичных конфигураций ПК
         # Поддерживаем несколько зданий, комнат и ПК
-        for building in range(1, 5):  # Здания 1-4
-            for room in range(100, 110):  # Комнаты 100-109
-                for pc in range(1, 6):  # ПК 1-5
-                    # Создаем типичные узлы для каждого ПК
-                    await self._create_typical_nodes_for_pc(building, room, pc)
+        # for building in range(1, 5):  # Здания 1-4
+        #     for room in range(100, 110):  # Комнаты 100-109
+        #         for pc in range(1, 6):  # ПК 1-5
+        #             # Создаем типичные узлы для каждого ПК
+        await self._create_typical_nodes_for_pc(1, 101, 1)
         
     async def _create_typical_nodes_for_pc(self, building, room, pc):
         """Создание типичных узлов для ПК"""

@@ -14,6 +14,30 @@ def is_admin():
     except:
         return False
 
+def run_as_admin():
+    """Перезапуск программы с правами администратора"""
+    try:
+        if is_admin():
+            return True
+        else:
+            print("Запрос прав администратора...")
+            # Получаем путь к текущему скрипту
+            script_path = os.path.abspath(sys.argv[0])
+            
+            # Запускаем скрипт с правами администратора
+            ctypes.windll.shell32.ShellExecuteW(
+                None, 
+                "runas", 
+                sys.executable, 
+                f'"{script_path}"', 
+                None, 
+                1
+            )
+            return False
+    except Exception as e:
+        print(f"Ошибка при запросе прав администратора: {e}")
+        return False
+
 def unblock_file(file_path):
     try:
         if not os.path.exists(file_path):
@@ -36,7 +60,8 @@ def initialize_openhardwaremonitor():
         possible_paths = [
             rf'{os.getcwd()}\ohm\OpenHardwareMonitorLib.dll',
             rf'{os.getcwd()}\OpenHardwareMonitorLib.dll',
-            r'.\ohm\OpenHardwareMonitorLib.dll'
+            r'.\ohm\OpenHardwareMonitorLib.dll',
+            rf'{os.path.dirname(os.getcwd())}\ohm\OpenHardwareMonitorLib.dll'
         ]
         
         file_path = None
@@ -86,7 +111,7 @@ def parse_sensor(sensor):
         temperature = float(sensor.Value)
         
         # Фильтруем некорректные значения (например, -13.5°C)
-        if temperature > -10 and temperature < 100:
+        if temperature > -10 and temperature < 150:
             result = u'{} {} Temperature Sensor #{} {} - {}\u00B0C'\
                     .format(hwtypes[sensor.Hardware.HardwareType], 
                             sensor.Hardware.Name, sensor.Index, 
@@ -95,9 +120,10 @@ def parse_sensor(sensor):
             print(result)
 
 def main():
-    if not is_admin():
-        print("ВНИМАНИЕ: Программа запущена без прав администратора!")
-        print("Перезапустите как администратор для корректной работы.")
+    # Проверяем права администратора и запрашиваем их при необходимости
+    if not run_as_admin():
+        print("Перезапуск с правами администратора...")
+        sys.exit(0)
     
     print("Инициализация OpenHardwareMonitor...")
     HardwareHandle = initialize_openhardwaremonitor()
@@ -108,7 +134,7 @@ def main():
     try:
         while True:
             fetch_stats(HardwareHandle)
-            time.sleep(1)  # Обновление каждую секунду
+            time.sleep(10)  # Обновление каждую секунду
             
     except KeyboardInterrupt:
         print("\nПрограмма прервана пользователем.")
