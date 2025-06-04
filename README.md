@@ -1,10 +1,76 @@
-# NIR
-1. Download python 3.7 or newer(recommend)
-2. Download app by ONE of this ways:
-    2.1. download archive from main branch: https://github.com/Truehand0fgod/NIR.git then extract
-    2.2. OR clone repos using git 
-3. Run(double click) install.bat and wait for the download to complete
-4. Open the terminal in the project directory
-5. Execute the commands:
-    5.1. python.exe ./server
-    5.2. python.exe ./client
+# PROJECT_NAME
+
+Main part is client. Client reads sensors data and sends it to OPC UA server. There is config.json file to specify server URL and other parameters like node ids.
+
+Server is for test purposes. It is just echo server.
+
+# Client requirements
+
+Windows-only application.
+
+Supports x86 and x86_64.
+
+Pre-requirements:
+* Python 3.7 or later,
+* .NET VERSION or Mono.
+
+Administrator access is required to use tcp port.
+
+# Server requirements
+
+Cross-platform application.
+
+Pre-requirements:
+* Python 3.7 or later.
+
+On Windows administrator access is required to listen tcp port.
+
+# First run
+
+Steps for first run.
+
+1) Download project from git.
+
+2) Open terminal in the project dir.
+
+3) Create virtual environment.
+```
+python -m venv venv
+```
+
+4) Activate virtual environment.
+```
+. venv/bin/activate
+```
+
+5) Update pip and setuptools.
+```
+python -m pip install -U pip setuptools
+```
+
+6. Install required python libraries.
+```
+pip install -r requirements.txt
+```
+
+7. Run server.
+```
+python server.py
+```
+
+8. Open second terminal, activate environment and run client.
+```
+python client.py
+```
+
+# Second run
+
+1. In the porject dir activate the environment.
+```
+. venv/bin/activate
+```
+
+2. Run client or server.
+```
+python client.py
+```
