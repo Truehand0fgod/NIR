@@ -12,7 +12,7 @@ Supports x86 and x86_64.
 
 Pre-requirements:
 * Python 3.7 or later,
-* .NET VERSION or Mono.
+* .NET Framework 4.5 or Mono.
 
 Administrator access is required to use tcp port.
 
